@@ -24,4 +24,10 @@ public class AppelController {
                                    @RequestParam int duree) {
         return appelService.passerAppel(emetteurId, recepteurId, duree);
     }
+
+    public Mono<Appel>PasserAppelParNumero(@RequestParam String emetteurNumber,
+                                           @RequestParam String recepteurNumber,
+                                           @RequestParam int duree){
+        return appelService.passerAppelParNumero(emetteurNumber,recepteurNumber,duree);
+    }
 }

@@ -56,4 +56,38 @@ public class AppelService {
 
         }).subscribeOn(jdbcScheduler);
     }
+
+    public Mono<Appel> passerAppelParNumero(String numeroEmetteur, String numeroRecepteur, int duree) {
+        return Mono.fromCallable(() -> {
+            Gsm emetteur = gsmRepository.findBySim_Numero(numeroEmetteur)
+                    .orElseThrow(() -> new RuntimeException("Numéro émetteur introuvable"));
+
+            Gsm recepteur = gsmRepository.findBySim_Numero(numeroRecepteur)
+                    .orElseThrow(() -> new RuntimeException("Numéro récepteur introuvable"));
+
+            // logique identique à avant
+            StatutAppel statut;
+            if (!emetteur.isAllume() || emetteur.getSim() == null ||0 < duree) {
+                statut = StatutAppel.SOLDE_INSUFFISANT;
+            } else if (!recepteur.isAllume() || recepteur.getSim() == null) {
+                statut = StatutAppel.INJOIGNABLE;
+            } else {
+                // Débiter les unités
+                int nouvellesUnites = 0 - duree;
+                emetteur.getSim().setUnites(nouvellesUnites);
+                statut = StatutAppel.SUCCES;
+            }
+
+            Appel appel = Appel.builder()
+                    .emetteur(emetteur)
+                    .recepteur(recepteur)
+                    .duree(duree)
+                    .date(LocalDateTime.now())
+                    .statut(statut)
+                    .build();
+
+            return appelRepository.save(appel);
+
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
 }
