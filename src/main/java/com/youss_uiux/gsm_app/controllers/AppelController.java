@@ -25,6 +25,7 @@ public class AppelController {
         return appelService.passerAppel(emetteurId, recepteurId, duree);
     }
 
+    @PostMapping("/passerParNumero")
     public Mono<Appel>PasserAppelParNumero(@RequestParam String emetteurNumber,
                                            @RequestParam String recepteurNumber,
                                            @RequestParam int duree){

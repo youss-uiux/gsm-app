@@ -5,12 +5,14 @@ import com.youss_uiux.gsm_app.models.Appel;
 import com.youss_uiux.gsm_app.models.Gsm;
 import com.youss_uiux.gsm_app.repository.AppelRepository;
 import com.youss_uiux.gsm_app.repository.GsmRepository;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 
+@Service
 public class AppelService {
     private final GsmRepository gsmRepository;
     private final AppelRepository appelRepository;
@@ -67,7 +69,7 @@ public class AppelService {
 
             // logique identique à avant
             StatutAppel statut;
-            if (!emetteur.isAllume() || emetteur.getSim() == null ||0 < duree) {
+            if (!emetteur.isAllume() || emetteur.getSim() == null || emetteur.getSim().getUnites() < duree) {
                 statut = StatutAppel.SOLDE_INSUFFISANT;
             } else if (!recepteur.isAllume() || recepteur.getSim() == null) {
                 statut = StatutAppel.INJOIGNABLE;
